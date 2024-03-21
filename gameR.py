@@ -1,6 +1,7 @@
-#v0.001
+#0.001
 import pygame
 import math
+import random
 
 pygame.init()
 
@@ -9,38 +10,71 @@ sc = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
 pygame.display.set_caption('GameR')
 
 FPS = 40
+list_for_squares = []
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, filename):
+        super().__init__()
         self.image = pygame.image.load(filename).convert()
         self.image.set_colorkey((0, 0, 0))
-        self.image = pygame.transform.scale(self.image, (self.image.get_width(), self.image.get_height()))
+        self.image = pygame.transform.scale(self.image, (self.image.get_width()*2, self.image.get_height()*2))
         self.rect = self.image.get_rect(center=(x, y))
         self.original_image = self.image
         self.original_rect = self.rect.copy()
 
-test_bullet = Bullet(400, 250, 'textures/gun/bullet/red/rectangle.png')
+    def update(self, target):
+        rel_x, rel_y = target[0] - self.rect.centerx, target[1] - self.rect.centery
+        self.angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        self.image = pygame.transform.rotate(self.original_image, int(self.angle))
+        self.rect = self.image.get_rect(center=self.rect.center)
 
-def rotate_for_mouse():
-    global test_bullet
-    mx, my = pygame.mouse.get_pos()
-    rel_x, rel_y = mx - test_bullet.rect.x, my - test_bullet.rect.y
-    angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-    test_bullet.image = pygame.transform.rotate(test_bullet.original_image, int(angle))
-    test_bullet.rect = test_bullet.image.get_rect(center=test_bullet.rect.center)
+class Floor(pygame.sprite.Sprite):
+    def __init__(self, x, y, filename):
+        super().__init__()
+        self.image = pygame.image.load(filename).convert()
+        self.image.set_colorkey((0, 0, 0))
+        self.image = pygame.transform.scale(self.image, (self.image.get_width()*2, self.image.get_height()*2))
+        self.rect = self.image.get_rect(center=(x, y))
+        self.original_image = self.image
+        self.original_rect = self.rect.copy()
+
+class Wall(pygame.sprite.Sprite):
+    def __init__(self, x, y, filename):
+        super().__init__()
+        self.image = pygame.image.load(filename).convert()
+        self.image.set_colorkey((0, 0, 0))
+        self.image = pygame.transform.scale(self.image, (self.image.get_width()*2, self.image.get_height()*2))
+        self.rect = self.image.get_rect(center=(x, y))
+        self.original_image = self.image
+        self.original_rect = self.rect.copy()
+
+def dr_all():
+    for x in range(200, 600, 20):
+        for y in range(50, 450, 20):
+            sc.blit(Wall(x, y, 'textures/biomes/forest/wall/stone.png').image,
+                    Wall(x, y, 'textures/biomes/forest/wall/stone.png').rect)
+
+def draw_room():
+    sc.blit(Wall(400, 250, 'textures/biomes/forest/wall/stone.png').image,
+            Wall(400, 250, 'textures/biomes/forest/wall/stone.png').rect)
+
+    sc.blit(Wall(420, 250, 'textures/biomes/forest/wall/stone.png').image,
+            Wall(420, 250, 'textures/biomes/forest/wall/stone.png').rect)
 
 clock = pygame.time.Clock()
-whilee = False
-while 1:
+running = True
+while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            whilee = True
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                pass
-    rotate_for_mouse()
-    sc.fill((50, 50, 50))
-    sc.blit(test_bullet.image, test_bullet.rect)
+            running = False
+        if event.type == pygame.MOUSEMOTION:
+            pass
 
-    if whilee == True: break
-    pygame.display.update()
+    mouse_pos = pygame.mouse.get_pos()
+
+    sc.fill((50, 50, 50))
+    dr_all()
+    pygame.display.flip()
+    clock.tick(FPS)
+
+pygame.quit()
