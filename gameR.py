@@ -80,11 +80,15 @@ class Hero(pygame.sprite.Sprite):
         self.original_rect = self.rect.copy()
 
 rooms = pygame.Surface((800, 500), pygame.SRCALPHA, 32)
-C_rooms = [0, 0]
+C_rooms = rooms.get_rect()
+C_rooms.x = 0
+C_rooms.y = 0
+rooms = rooms.convert_alpha()
 rooms_mask = pygame.mask.from_surface(rooms)
 
 floor = pygame.Surface((800, 500), pygame.SRCALPHA, 32)
 C_floor = [0, 0]
+floor = floor.convert_alpha()
 floor_mask = pygame.mask.from_surface(floor)
 
 robot = Hero(400, 250, 'textures/heroes/robot/red_robot.png')
@@ -164,14 +168,21 @@ while running:
         C_floor[0] = C_floor[0] - 6
         C_rooms[0] = C_rooms[0] - 6
 
-    offset = (int(robot.rect.x - C_rooms[1]), int(robot.rect.y - C_rooms[0]))
+    offset = (int(robot.rect.x - C_rooms.x), int(robot.rect.y - C_rooms.y))
     if rooms_mask.overlap_area(robot_mask, offset):
         print('пересечение')
 
-    offset = (int(robot.rect.x - C_floor[1]), int(robot.rect.y - C_floor[0]))
+    offset = (int(robot.rect.x - C_floor[0]), int(robot.rect.y - C_floor[1]))
     if floor_mask.overlap_area(robot_mask, offset):
         print('пересечение')
-    print(rooms_mask.overlap_area(robot_mask, offset))
+
+    offset = (int(C_floor[0] - robot.rect.x), int(C_floor[1] - robot.rect.y))
+    if robot_mask.overlap_area(floor_mask, offset):
+        print('пересечение')
+
+    if robot.rect.collidepoint((C_rooms.x, C_rooms.y)):
+        print('awdawdawd')
+
     pygame.display.flip()
     clock.tick(FPS)
 
