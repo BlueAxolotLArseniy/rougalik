@@ -85,6 +85,7 @@ rooms_mask = pygame.mask.from_surface(rooms)
 
 floor = pygame.Surface((800, 500), pygame.SRCALPHA, 32)
 C_floor = [0, 0]
+floor_mask = pygame.mask.from_surface(floor)
 
 robot = Hero(400, 250, 'textures/heroes/robot/red_robot.png')
 robot_mask = pygame.mask.from_surface(robot.image)
@@ -163,8 +164,12 @@ while running:
         C_floor[0] = C_floor[0] - 6
         C_rooms[0] = C_rooms[0] - 6
 
-    offset = (int(robot.rect.x - C_rooms[0]), int(robot.rect.y - C_rooms[1]))
+    offset = (int(robot.rect.x - C_rooms[1]), int(robot.rect.y - C_rooms[0]))
     if rooms_mask.overlap_area(robot_mask, offset):
+        print('пересечение')
+
+    offset = (int(robot.rect.x - C_floor[1]), int(robot.rect.y - C_floor[0]))
+    if floor_mask.overlap_area(robot_mask, offset):
         print('пересечение')
     print(rooms_mask.overlap_area(robot_mask, offset))
     pygame.display.flip()
