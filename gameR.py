@@ -155,33 +155,32 @@ while running:
     sc.blit(rooms, C_rooms)
     # dr_all()
 
+    # if flDown == True:
+    #     C_floor[1] = C_floor[1] - 6
+    #     C_rooms[1] = C_rooms[1] - 6
+    # if flUp == True:
+    #     C_floor[1] = C_floor[1] + 6
+    #     C_rooms[1] = C_rooms[1] + 6
+    # if flLeft == True:
+    #     C_floor[0] = C_floor[0] + 6
+    #     C_rooms[0] = C_rooms[0] + 6
+    # if flRight == True:
+    #     C_floor[0] = C_floor[0] - 6
+    #     C_rooms[0] = C_rooms[0] - 6
+
     if flDown == True:
-        C_floor[1] = C_floor[1] - 6
-        C_rooms[1] = C_rooms[1] - 6
+        robot.rect.y += 6
     if flUp == True:
-        C_floor[1] = C_floor[1] + 6
-        C_rooms[1] = C_rooms[1] + 6
+        robot.rect.y -= 6
     if flLeft == True:
-        C_floor[0] = C_floor[0] + 6
-        C_rooms[0] = C_rooms[0] + 6
+        robot.rect.x -= 6
     if flRight == True:
-        C_floor[0] = C_floor[0] - 6
-        C_rooms[0] = C_rooms[0] - 6
+        robot.rect.x += 6
 
     offset = (int(robot.rect.x - C_rooms.x), int(robot.rect.y - C_rooms.y))
     if rooms_mask.overlap_area(robot_mask, offset):
         print('пересечение')
 
-    offset = (int(robot.rect.x - C_floor[0]), int(robot.rect.y - C_floor[1]))
-    if floor_mask.overlap_area(robot_mask, offset):
-        print('пересечение')
-
-    offset = (int(C_floor[0] - robot.rect.x), int(C_floor[1] - robot.rect.y))
-    if robot_mask.overlap_area(floor_mask, offset):
-        print('пересечение')
-
-    if robot.rect.collidepoint((C_rooms.x, C_rooms.y)):
-        print('awdawdawd')
 
     pygame.display.flip()
     clock.tick(FPS)
