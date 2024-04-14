@@ -84,15 +84,12 @@ C_rooms = rooms.get_rect()
 C_rooms.x = 0
 C_rooms.y = 0
 rooms = rooms.convert_alpha()
-rooms_mask = pygame.mask.from_surface(rooms)
 
 floor = pygame.Surface((800, 500), pygame.SRCALPHA, 32)
 C_floor = [0, 0]
 floor = floor.convert_alpha()
-floor_mask = pygame.mask.from_surface(floor)
 
 robot = Hero(400, 250, 'textures/heroes/robot/red_robot.png')
-robot_mask = pygame.mask.from_surface(robot.image)
 
 def dr_all():
     point = 0
@@ -107,11 +104,11 @@ def dr_one_stack(x, y):
         if i == 1:
             q = random.randint(0, 4)
             if q == 0:
-                rooms.blit(Wall(point, y, 'textures/biomes/forest/wall/stone.png').image,
-                            Wall(point, y, 'textures/biomes/forest/wall/stone.png').rect)
+                wall = Wall(point, y, 'textures/biomes/forest/wall/stone.png')
+                rooms.blit(wall.image, wall.rect)
             else:
-                rooms.blit(Wall(point, y, 'textures/biomes/forest/wall/tree.png').image,
-                           Wall(point, y, 'textures/biomes/forest/wall/tree.png').rect)
+                wall = Wall(point, y, 'textures/biomes/forest/wall/tree.png')
+                rooms.blit(wall.image, wall.rect)
         if i == 0:
             q = random.randint(1, 3)
             if q == 1:
@@ -126,6 +123,10 @@ def dr_one_stack(x, y):
         point += 20
 dr_all()
 clock = pygame.time.Clock()
+
+rooms_mask = pygame.mask.from_surface(rooms)
+floor_mask = pygame.mask.from_surface(floor)
+robot_mask = pygame.mask.from_surface(robot.image)
 
 flLeft = flRight = False
 flUp = flDown = False
