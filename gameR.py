@@ -9,6 +9,9 @@ sc = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
 
 pygame.display.set_caption('GameR')
 
+coordinates1 = None
+coordinates2 = None
+
 FPS = 40
 list_for_squares = []
 
@@ -79,11 +82,29 @@ class Hero(pygame.sprite.Sprite):
         self.original_image = self.image
         self.original_rect = self.rect.copy()
 
+class Gun(pygame.sprite.Sprite):
+    def __init__(self, x, y, filename):
+        super().__init__()
+        self.image = pygame.image.load(filename).convert()
+        self.image.set_colorkey((255, 255, 255))
+        self.image = pygame.transform.scale(self.image, (self.image.get_width()*2, self.image.get_height()*2))
+        self.rect = self.image.get_rect(center=(x, y))
+        self.original_image = self.image
+        self.original_rect = self.rect.copy()
+
+    def update(self, target):
+        rel_x, rel_y = target[0] - self.rect.centerx, target[1] - self.rect.centery
+        self.angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        self.image = pygame.transform.rotate(self.original_image, int(self.angle))
+        self.rect = self.image.get_rect(center=self.rect.center)
+
 rooms = pygame.Surface((800, 500), pygame.SRCALPHA, 32)
 C_rooms = rooms.get_rect()
 C_rooms.x = 0
 C_rooms.y = 0
 rooms = rooms.convert_alpha()
+
+pistol = Gun(0, 0, 'textures/gun/pistol/oldest_pistol.png')
 
 floor = pygame.Surface((800, 500), pygame.SRCALPHA, 32)
 C_floor = [0, 0]
@@ -154,6 +175,10 @@ while running:
     sc.blit(floor, C_floor)
     sc.blit(robot.image, robot.rect)
     sc.blit(rooms, C_rooms)
+    sc.blit(pistol.image, pistol.rect)
+    pistol.update(pygame.mouse.get_pos())
+    pistol.rect.centerx = robot.rect.centerx
+    pistol.rect.centery = robot.rect.centery
     # dr_all()
 
     # if flDown == True:
@@ -179,9 +204,29 @@ while running:
         robot.rect.x += 6
 
     offset = (int(robot.rect.x - C_rooms.x), int(robot.rect.y - C_rooms.y))
-    if rooms_mask.overlap_area(robot_mask, offset):
-        print('пересечение')
+    if not rooms_mask.overlap_area(robot_mask, offset):
+        coordinates2 = coordinates1
+        coordinates1 = (robot.rect.x, robot.rect.y)
 
+    offset = (int(robot.rect.x - C_rooms.x), int(robot.rect.y - C_rooms.y))
+    if rooms_mask.overlap_area(robot_mask, offset):
+        if flUp == True and flRight == True:
+            offset = (int(robot.rect.x + 6 - C_rooms.x), int(robot.rect.y - C_rooms.y))
+            if not rooms_mask.overlap_area(robot_mask, offset):
+                robot.rect.x += 6
+            else:
+                robot.rect.x = coordinates2[0]
+            offset = (int(robot.rect.x - C_rooms.x), int(robot.rect.y - 6 - C_rooms.y))
+            if not rooms_mask.overlap_area(robot_mask, offset):
+                robot.rect.y -= 6
+            else:
+                robot.rect.y = coordinates2[1]
+        else:
+            print('пересечение')
+            robot.rect.x = coordinates2[0]
+            robot.rect.y = coordinates2[1]
+
+    print(coordinates1, coordinates2)
 
     pygame.display.flip()
     clock.tick(FPS)
