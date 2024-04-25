@@ -305,7 +305,7 @@ class Wall(pygame.sprite.Sprite):
         self.image = pygame.image.load(filename).convert()
         self.image.set_colorkey((0, 0, 0))
         self.image = pygame.transform.scale(self.image, (self.image.get_width()*2, self.image.get_height()*2))
-        self.rect = self.image.get_rect(center=(x, y))
+        self.rect = self.image.get_rect(center=(x, y+5))
         self.original_image = self.image
         self.original_rect = self.rect.copy()
 
@@ -372,13 +372,13 @@ def dr_one_stack(x, y):
         if i == 0:
             q = random.randint(1, 3)
             if q == 1:
-                wall = Wall(point, y, 'textures/biomes/forest/floor/dark.png')
+                wall = Floor(point, y+10, 'textures/biomes/forest/floor/dark.png')
                 floor.blit(wall.image, wall.rect)
             if q == 2:
-                wall = Wall(point, y, 'textures/biomes/forest/floor/light.png')
+                wall = Floor(point, y+10, 'textures/biomes/forest/floor/light.png')
                 floor.blit(wall.image, wall.rect)
             if q == 3:
-                wall = Wall(point, y, 'textures/biomes/forest/floor/medium.png')
+                wall = Floor(point, y+10, 'textures/biomes/forest/floor/medium.png')
                 floor.blit(wall.image, wall.rect)
         point += 20
 dr_all()
@@ -418,21 +418,6 @@ while running:
     if flRight == True:
         robot.rect.x += 6
 
-    for i in lst_of_walls:
-        if not i.rect.colliderect(robot.rect):
-            coordinates2 = coordinates1
-            coordinates1 = (robot.rect.x, robot.rect.y)
-
-    sc.fill((0, 0, 0))
-    # rooms.fill((0, 0, 0))
-    sc.blit(floor, C_floor)
-    sc.blit(robot.image, robot.rect)
-    sc.blit(rooms, C_rooms)
-    # sc.blit(pistol.image, pistol.rect)
-    pistol.update(pygame.mouse.get_pos())
-    pistol.rect.centerx = robot.rect.centerx
-    pistol.rect.centery = robot.rect.centery
-    # dr_all()
 
     # if flDown == True:
     #     C_floor[1] = C_floor[1] - 6
@@ -447,13 +432,43 @@ while running:
     #     C_floor[0] = C_floor[0] - 6
     #     C_rooms[0] = C_rooms[0] - 6
 
+    # for i in lst_of_walls:
+    #     if i.rect.collidepoint(robot.rect.topright[0]-10, robot.rect.topright[1]) and flUp == True:
+    #         print('awd')
+    #         q2 = i.rect.y
+    #         robot.rect.top += robot.rect.topright[1] - q2 - 30
+    # for i in lst_of_walls:
+    #     if i.rect.collidepoint(robot.rect.bottomright[0] - 10, robot.rect.bottomright[1]) and flDown == True:
+    #         print('awd2')
+    #         q2 = i.rect.y
+    #         robot.rect.bottom -= robot.rect.bottomright[1] - q2 - 10
+
     for i in lst_of_walls:
-        if i.rect.collidepoint(robot.rect.topright[0]-10, robot.rect.topright[1]):
-            print('awd')
-            robot.rect.y = coordinates2[1]
+        if robot.rect.colliderect(i.rect):
+            if robot.rect.centerx < i.rect.centerx:
+                deepX = i.rect.left - robot.rect.right
+            else:
+                deepX = -(robot.rect.left - i.rect.right)
+            if robot.rect.centery < i.rect.centery:
+                deepY = i.rect.top - robot.rect.bottom
+            else:
+                deepY = -(robot.rect.top - i.rect.bottom)
+            print(deepX, deepY)
+            if abs(deepX) < abs(deepY):
+                robot.rect.x += deepX
+            else:
+                robot.rect.y += deepY
 
-    print(coordinates1, coordinates2)
-
+    sc.fill((0, 0, 0))
+    # rooms.fill((0, 0, 0))
+    sc.blit(floor, C_floor)
+    sc.blit(robot.image, robot.rect)
+    sc.blit(rooms, C_rooms)
+    # sc.blit(pistol.image, pistol.rect)
+    pistol.update(pygame.mouse.get_pos())
+    pistol.rect.centerx = robot.rect.centerx
+    pistol.rect.centery = robot.rect.centery
+    print(robot.rect)
     pygame.display.flip()
     clock.tick(FPS)
 
