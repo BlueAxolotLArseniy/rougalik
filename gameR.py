@@ -12,6 +12,8 @@ yQ = None
 player_direction_right = True
 player_direction_left = False
 
+speed_player = 6
+
 pygame.display.set_caption('GameR')
 
 coordinates1 = None
@@ -174,6 +176,7 @@ robot_mask = pygame.mask.from_surface(robot.image)
 
 flLeft = flRight = False
 flUp = flDown = False
+flShift = False
 
 running = True
 while running:
@@ -185,23 +188,29 @@ while running:
             elif event.key == pygame.K_w: flUp = True
             elif event.key == pygame.K_a: flLeft = True
             elif event.key == pygame.K_d: flRight = True
+            elif event.key == pygame.K_LSHIFT: flShift = True
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_s: flDown = False
             if event.key == pygame.K_w: flUp = False
             if event.key == pygame.K_a: flLeft = False
             if event.key == pygame.K_d: flRight = False
+            if event.key == pygame.K_LSHIFT: flShift = False
 
     mouse_pos = pygame.mouse.get_pos()
 
 
     if flDown == True:
-        robot.rect.y += 6
+        robot.rect.y += speed_player
     if flUp == True:
-        robot.rect.y -= 6
+        robot.rect.y -= speed_player
     if flLeft == True:
-        robot.rect.x -= 6
+        robot.rect.x -= speed_player
     if flRight == True:
-        robot.rect.x += 6
+        robot.rect.x += speed_player
+    if flShift == True:
+        speed_player = 2
+    if flShift != True:
+        speed_player = 6
 
     for i in lst_of_walls:
         if robot.rect.colliderect(i.rect):
@@ -244,13 +253,13 @@ while running:
     pistol.update(pygame.mouse.get_pos())
     pistolR.update(pygame.mouse.get_pos())
     if pygame.mouse.get_pos()[0] - robot.rect.centerx > 0:
-        sc.blit(pistol.image, pistol.rect)
         pistol.rect.centerx = robot.rect.centerx
         pistol.rect.centery = robot.rect.centery
+        sc.blit(pistol.image, pistol.rect)
     if pygame.mouse.get_pos()[0] - robot.rect.centerx < 0:
-        sc.blit(pistolR.image, pistolR.rect)
         pistolR.rect.centerx = robot.rect.centerx
         pistolR.rect.centery = robot.rect.centery
+        sc.blit(pistolR.image, pistolR.rect)
     pygame.display.flip()
     clock.tick(FPS)
 
