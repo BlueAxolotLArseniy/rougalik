@@ -46,6 +46,10 @@ matrix_of_rooms = [[1 for _ in range(20)],
 lst_of_walls = []
 
 class Bullet(pygame.sprite.Sprite):
+
+    printing = False
+    speed = 10
+
     def __init__(self, x, y, filename):
         super().__init__()
         self.image = pygame.image.load(filename).convert()
@@ -60,6 +64,26 @@ class Bullet(pygame.sprite.Sprite):
         self.angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
         self.image = pygame.transform.rotate(self.original_image, int(self.angle))
         self.rect = self.image.get_rect(center=self.rect.center)
+
+    def new_coordinates(self):
+
+        # Получаем координаты мыши относительно экрана
+        mouse_pos = pygame.mouse.get_pos()
+
+        # Вычисляем координаты мыши относительно центра экрана
+        mouse_x = pygame.mouse.get_pos()[0]
+        mouse_y = pygame.mouse.get_pos()[1]
+
+        # Вычисляем направление
+        angle = math.atan2(mouse_y - self.rect.centery, mouse_x - self.rect.centerx)
+        dx = math.cos(angle)
+        dy = math.sin(angle)
+        self.direction = (dx, dy)
+
+    def move(self):
+        # перемещаем атаку
+        self.rect.x += self.speed * self.direction[0]
+        self.rect.y += self.speed * self.direction[1]
 
 class Floor(pygame.sprite.Sprite):
     def __init__(self, x, y, filename):
@@ -123,11 +147,20 @@ rooms = rooms.convert_alpha()
 pistol = Gun(0, 0, 'textures/gun/pistol/p250.png')
 pistolR = Gun(0, 0, 'textures/gun/pistol/p250R.png')
 
+test_bullet = Bullet(0, 0, 'textures/gun/bullet/yellow/rectangle.png')
+
 floor = pygame.Surface((800, 500), pygame.SRCALPHA, 32)
 C_floor = [0, 0]
 floor = floor.convert_alpha()
 
 robot = Hero(400, 250, 'textures/heroes/robot/red_robot.png')
+
+def rotate(self):
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    rel_x, rel_y = mouse_x - self.rect.x, mouse_y - self.rect.y
+    angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+    self.image = pygame.transform.rotate(self.original_image, int(angle))
+    self.rect = self.image.get_rect(center=self.rect.center)
 
 def dr_all():
     point = 0
@@ -195,6 +228,11 @@ while running:
             if event.key == pygame.K_a: flLeft = False
             if event.key == pygame.K_d: flRight = False
             if event.key == pygame.K_LSHIFT: flShift = False
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            test_bullet.printing = True
+            test_bullet.rect.center = pistol.rect.center
+            test_bullet.new_coordinates()
+            rotate(test_bullet)
 
     mouse_pos = pygame.mouse.get_pos()
 
@@ -250,16 +288,21 @@ while running:
     sc.blit(floor, C_floor)
     sc.blit(rooms, [C_rooms[0], C_rooms[1]-10])
     sc.blit(robot.image, (robot.rect.x-10, robot.rect.y - 20))
-    pistol.update(pygame.mouse.get_pos())
-    pistolR.update(pygame.mouse.get_pos())
+    if test_bullet.printing == True:
+        sc.blit(test_bullet.image, test_bullet.rect)
+        test_bullet.move()
+    else: test_bullet.rect.center = pistol.rect.center
     if pygame.mouse.get_pos()[0] - robot.rect.centerx > 0:
         pistol.rect.centerx = robot.rect.centerx
         pistol.rect.centery = robot.rect.centery
+        rotate(pistol)
         sc.blit(pistol.image, pistol.rect)
-    if pygame.mouse.get_pos()[0] - robot.rect.centerx < 0:
+    elif pygame.mouse.get_pos()[0] - robot.rect.centerx < 0:
         pistolR.rect.centerx = robot.rect.centerx
         pistolR.rect.centery = robot.rect.centery
+        rotate(pistolR)
         sc.blit(pistolR.image, pistolR.rect)
+
     pygame.display.flip()
     clock.tick(FPS)
 
