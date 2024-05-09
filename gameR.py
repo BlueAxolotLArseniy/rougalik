@@ -5,16 +5,22 @@ import random
 pygame.init()
 
 sc = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
+pygame.display.set_icon(pygame.image.load("textures/others/gameicon.bmp"))
+pygame.display.set_caption('GFR - Game For Rogalick')
 
 pointQ = None
 yQ = None
+
+pygame.mouse.set_visible(False)
 
 player_direction_right = True
 player_direction_left = False
 
 speed_player = 6
 
-pygame.display.set_caption('GameR')
+cursor = pygame.image.load('textures/others/cursor.png').convert()
+cursor.set_colorkey((0, 0, 0))
+cursor = pygame.transform.scale(cursor, (cursor.get_width() * 2, cursor.get_height() * 2))
 
 coordinates1 = None
 coordinates2 = None
@@ -302,7 +308,7 @@ while running:
         pistolR.rect.centery = robot.rect.centery
         rotate(pistolR)
         sc.blit(pistolR.image, pistolR.rect)
-
+    sc.blit(cursor, pygame.mouse.get_pos())
     pygame.display.flip()
     clock.tick(FPS)
 
