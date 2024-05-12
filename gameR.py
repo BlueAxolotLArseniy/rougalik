@@ -11,6 +11,13 @@ pygame.display.set_caption('GFR - Game For Rogalick')
 pointQ = None
 yQ = None
 
+number_of_on_mouse = 0
+
+string_of_bullet = f'test_bullet{number_of_on_mouse} = Bullet(0, 0, "textures/gun/bullet/yellow/rectangle.png")'
+name_of_bullet = f'test_bullet{number_of_on_mouse}'
+
+list_of_bullets = []
+
 pygame.mouse.set_visible(False)
 
 player_direction_right = True
@@ -161,6 +168,17 @@ floor = floor.convert_alpha()
 
 robot = Hero(400, 250, 'textures/heroes/robot/red_robot.png')
 
+def new_bullet():
+    global number_of_on_mouse, string_of_bullet, list_of_bullets, name_of_bullet
+    list_of_bullets.append(Bullet(robot.rect.centerx, robot.rect.centery, 'textures/gun/bullet/yellow/rectangle.png'))
+    list_of_bullets[number_of_on_mouse].printing = True
+    list_of_bullets[number_of_on_mouse].rect.center = robot.rect.center
+    list_of_bullets[number_of_on_mouse].new_coordinates()
+    rotate(list_of_bullets[number_of_on_mouse])
+    number_of_on_mouse += 1
+
+
+
 def rotate(self):
     mouse_x, mouse_y = pygame.mouse.get_pos()
     rel_x, rel_y = mouse_x - self.rect.x, mouse_y - self.rect.y
@@ -235,10 +253,7 @@ while running:
             if event.key == pygame.K_d: flRight = False
             if event.key == pygame.K_LSHIFT: flShift = False
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            test_bullet.printing = True
-            test_bullet.rect.center = pistol.rect.center
-            test_bullet.new_coordinates()
-            rotate(test_bullet)
+            new_bullet()
 
     mouse_pos = pygame.mouse.get_pos()
 
@@ -274,6 +289,9 @@ while running:
             if (deepX == 6 and deepY == 6 or deepX == 6 and deepY == -19) or (deepX == -6 and deepY == 6 or deepX == -6 and deepY == -19):
                 if flUp and flLeft or flUp and flRight:
                     robot.rect.y -= 6
+        for i2 in list_of_bullets:
+            if i2.rect.colliderect(i.rect):
+                i2.printing = False
 
     if pygame.mouse.get_pos()[0] - robot.rect.centerx > 0 and player_direction_left:
         robot.image = pygame.transform.flip(robot.image, True, False)
@@ -294,10 +312,11 @@ while running:
     sc.blit(floor, C_floor)
     sc.blit(rooms, [C_rooms[0], C_rooms[1]-10])
     sc.blit(robot.image, (robot.rect.x-10, robot.rect.y - 20))
-    if test_bullet.printing == True:
-        sc.blit(test_bullet.image, test_bullet.rect)
-        test_bullet.move()
-    else: test_bullet.rect.center = pistol.rect.center
+    for i in list_of_bullets:
+        if i.printing == True:
+            sc.blit(i.image, i.rect)
+            i.move()
+        else: i.rect.center = pistol.rect.center
     if pygame.mouse.get_pos()[0] - robot.rect.centerx > 0:
         pistol.rect.centerx = robot.rect.centerx
         pistol.rect.centery = robot.rect.centery
@@ -311,5 +330,7 @@ while running:
     sc.blit(cursor, pygame.mouse.get_pos())
     pygame.display.flip()
     clock.tick(FPS)
+
+    print(number_of_on_mouse, robot.rect.center)
 
 pygame.quit()
