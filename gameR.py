@@ -35,26 +35,11 @@ coordinates2 = None
 FPS = 40
 list_for_squares = []
 
-matrix_of_rooms = [[1 for _ in range(20)],
-                   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-                   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                   [1 for _ in range(20)]]
+file = open('settings/samples/usual_fightes.txt', 'r')
+
+
+matrix_of_rooms = [[w for w in line.replace('\n', '')] for line in file]
+print(matrix_of_rooms)
 
 lst_of_walls = []
 
@@ -168,6 +153,28 @@ floor = floor.convert_alpha()
 
 robot = Hero(400, 250, 'textures/heroes/robot/red_robot.png')
 
+def draw_all_in_all():
+    global matrix_of_rooms
+    for i in matrix_of_rooms:
+        for k in i:
+            if k == '0':
+                q = open('settings/rooms&locations/vode/vode.txt')
+                q = [[w for w in line.replace('\n', '')] for line in q]
+                print(q)
+                dr_all(q)
+            elif k == '-':
+                q = open('settings/rooms&locations/hall/horizontal_hall.txt')
+                q = [[w for w in line.replace('\n', '')] for line in q]
+                dr_all(q)
+            elif k == '|':
+                q = open('settings/rooms&locations/hall/vertical_hall.txt')
+                q = [[w for w in line.replace('\n', '')] for line in q]
+                dr_all(q)
+            else:
+                q = open('settings/rooms&locations/fight/rooms.txt')
+                q = [[w for w in line.replace('\n', '')] for line in q]
+                dr_all(q)
+
 def new_bullet():
     global number_of_on_mouse, string_of_bullet, list_of_bullets, name_of_bullet
     list_of_bullets.append(Bullet(robot.rect.centerx, robot.rect.centery, 'textures/gun/bullet/yellow/rectangle.png'))
@@ -186,16 +193,19 @@ def rotate(self):
     self.image = pygame.transform.rotate(self.original_image, int(angle))
     self.rect = self.image.get_rect(center=self.rect.center)
 
-def dr_all():
+def dr_all(file):
     point = 0
-    for y in range(50, 450, 20):
-        dr_one_stack(point, y)
+    ok = 80
+    for y in range(13):
+        dr_one_stack(point, ok, file)
         point += 1
+        ok+=20
 
-def dr_one_stack(x, y):
-    global matrix_of_rooms, sc, pointQ, yQ
+def dr_one_stack(x, y, file):
+    global sc, pointQ, yQ
     point = 200
-    for i in matrix_of_rooms[x]:
+    print(len(matrix_of_rooms), x)
+    for i in file[x]:
         if i == 1:
             q = random.randint(0, 4)
             if q == 0:
@@ -224,7 +234,7 @@ def dr_one_stack(x, y):
                 wall = Floor(point, y+10, 'textures/biomes/forest/floor/medium.png')
                 floor.blit(wall.image, wall.rect)
         point += 20
-dr_all()
+draw_all_in_all()
 clock = pygame.time.Clock()
 
 rooms_mask = pygame.mask.from_surface(rooms)
@@ -330,7 +340,7 @@ while running:
     sc.blit(cursor, pygame.mouse.get_pos())
     pygame.display.flip()
     clock.tick(FPS)
-
+    draw_all_in_all()
     print(number_of_on_mouse, robot.rect.center)
 
 pygame.quit()
