@@ -4,12 +4,14 @@ import random
 
 pygame.init()
 
-sc = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
+sc = pygame.display.set_mode((2000, 500), pygame.RESIZABLE)
 pygame.display.set_icon(pygame.image.load("textures/others/gameicon.bmp"))
 pygame.display.set_caption('GFR - Game For Rogalick')
 
 pointQ = None
 yQ = None
+XpointX = 200
+YpointY = 80
 
 number_of_on_mouse = 0
 
@@ -136,7 +138,7 @@ class Gun(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.original_image, int(self.angle))
         self.rect = self.image.get_rect(center=self.rect.center)
 
-rooms = pygame.Surface((800, 500), pygame.SRCALPHA, 32)
+rooms = pygame.Surface((2000, 2000), pygame.SRCALPHA, 32)
 C_rooms = rooms.get_rect()
 C_rooms.x = 0
 C_rooms.y = 0
@@ -147,17 +149,18 @@ pistolR = Gun(0, 0, 'textures/gun/pistol/p250R.png')
 
 test_bullet = Bullet(0, 0, 'textures/gun/bullet/yellow/rectangle.png')
 
-floor = pygame.Surface((800, 500), pygame.SRCALPHA, 32)
+floor = pygame.Surface((2000, 2000), pygame.SRCALPHA, 32)
 C_floor = [0, 0]
 floor = floor.convert_alpha()
 
 robot = Hero(400, 250, 'textures/heroes/robot/red_robot.png')
 
 def draw_all_in_all():
-    global matrix_of_rooms
+    global matrix_of_rooms, XpointX, YpointY
     for i in matrix_of_rooms:
         for k in i:
-            if k == '0':
+            if XpointX == 1500: XpointX = 260
+            if k == '0' or k == '7':
                 q = open('settings/rooms&locations/vode/vode.txt')
                 q = [[w for w in line.replace('\n', '')] for line in q]
                 print(q)
@@ -174,6 +177,9 @@ def draw_all_in_all():
                 q = open('settings/rooms&locations/fight/rooms.txt')
                 q = [[w for w in line.replace('\n', '')] for line in q]
                 dr_all(q)
+            XpointX += 260
+
+        YpointY += 260
 
 def new_bullet():
     global number_of_on_mouse, string_of_bullet, list_of_bullets, name_of_bullet
@@ -194,19 +200,20 @@ def rotate(self):
     self.rect = self.image.get_rect(center=self.rect.center)
 
 def dr_all(file):
+    global YpointY
     point = 0
-    ok = 80
+    ok = YpointY
     for y in range(13):
         dr_one_stack(point, ok, file)
         point += 1
         ok+=20
 
 def dr_one_stack(x, y, file):
-    global sc, pointQ, yQ
-    point = 200
+    global sc, pointQ, yQ, XpointX
+    point = XpointX
     print(len(matrix_of_rooms), x)
     for i in file[x]:
-        if i == 1:
+        if i == '1':
             q = random.randint(0, 4)
             if q == 0:
                 wall = Wall(point, y, 'textures/biomes/forest/wall/stone.png')
@@ -222,7 +229,7 @@ def dr_one_stack(x, y, file):
                 pointQ = point
                 yQ = y
                 pygame.draw.rect(sc, (255, 255, 255), (point - 10, y - 10, 20, 20), 5)
-        if i == 0:
+        if i == '0':
             q = random.randint(1, 3)
             if q == 1:
                 wall = Floor(point, y+10, 'textures/biomes/forest/floor/dark.png')
@@ -340,7 +347,6 @@ while running:
     sc.blit(cursor, pygame.mouse.get_pos())
     pygame.display.flip()
     clock.tick(FPS)
-    draw_all_in_all()
     print(number_of_on_mouse, robot.rect.center)
 
 pygame.quit()
