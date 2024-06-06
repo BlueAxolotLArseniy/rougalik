@@ -4,7 +4,7 @@ import random
 
 pygame.init()
 
-sc = pygame.display.set_mode((2000, 500), pygame.RESIZABLE)
+sc = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
 pygame.display.set_icon(pygame.image.load("textures/others/gameicon.bmp"))
 pygame.display.set_caption('GFR - Game For Rogalick')
 
@@ -150,7 +150,9 @@ pistolR = Gun(0, 0, 'textures/gun/pistol/p250R.png')
 test_bullet = Bullet(0, 0, 'textures/gun/bullet/yellow/rectangle.png')
 
 floor = pygame.Surface((2000, 2000), pygame.SRCALPHA, 32)
-C_floor = [0, 0]
+C_floor = floor.get_rect()
+C_floor.x = 0
+C_floor.y = 0
 floor = floor.convert_alpha()
 
 robot = Hero(400, 250, 'textures/heroes/robot/red_robot.png')
@@ -159,7 +161,7 @@ def draw_all_in_all():
     global matrix_of_rooms, XpointX, YpointY
     for i in matrix_of_rooms:
         for k in i:
-            if XpointX == 1500: XpointX = 260
+            if XpointX == 1500: XpointX = 200
             if k == '0' or k == '7':
                 q = open('settings/rooms&locations/vode/vode.txt')
                 q = [[w for w in line.replace('\n', '')] for line in q]
@@ -173,6 +175,8 @@ def draw_all_in_all():
                 q = open('settings/rooms&locations/hall/vertical_hall.txt')
                 q = [[w for w in line.replace('\n', '')] for line in q]
                 dr_all(q)
+            elif k == 'v':
+                pass
             else:
                 q = open('settings/rooms&locations/fight/rooms.txt')
                 q = [[w for w in line.replace('\n', '')] for line in q]
@@ -276,13 +280,33 @@ while running:
 
 
     if flDown == True:
-        robot.rect.y += speed_player
+        C_rooms.y -= speed_player
+        C_floor.y -= speed_player
+        for i in lst_of_walls:
+            i.rect.y -= speed_player
+        for i in list_of_bullets:
+            i.rect.y -= speed_player
     if flUp == True:
-        robot.rect.y -= speed_player
+        C_rooms.y += speed_player
+        C_floor.y += speed_player
+        for i in lst_of_walls:
+            i.rect.y += speed_player
+        for i in list_of_bullets:
+            i.rect.y += speed_player
     if flLeft == True:
-        robot.rect.x -= speed_player
+        C_rooms.x += speed_player
+        C_floor.x += speed_player
+        for i in lst_of_walls:
+            i.rect.x += speed_player
+        for i in list_of_bullets:
+            i.rect.x += speed_player
     if flRight == True:
-        robot.rect.x += speed_player
+        C_rooms.x -= speed_player
+        C_floor.x -= speed_player
+        for i in lst_of_walls:
+            i.rect.x -= speed_player
+        for i in list_of_bullets:
+            i.rect.x -= speed_player
     if flShift == True:
         speed_player = 2
     if flShift != True:
@@ -290,6 +314,7 @@ while running:
 
     for i in lst_of_walls:
         if robot.rect.colliderect(i.rect):
+            print('awd')
             if robot.rect.centerx < i.rect.centerx:
                 deepX = i.rect.left - robot.rect.right
             else:
@@ -300,12 +325,21 @@ while running:
                 deepY = -(robot.rect.top - i.rect.bottom)
             print(deepX, deepY)
             if abs(deepX) < abs(deepY):
-                robot.rect.x += deepX
+                C_rooms.x -= deepX
+                C_floor.x -= deepX
+                for i in lst_of_walls:
+                    i.rect.x -= deepX
             else:
-                robot.rect.y += deepY
+                C_rooms.y -= deepY
+                C_floor.y -= deepY
+                for i in lst_of_walls:
+                    i.rect.y -= deepY
             if (deepX == 6 and deepY == 6 or deepX == 6 and deepY == -19) or (deepX == -6 and deepY == 6 or deepX == -6 and deepY == -19):
                 if flUp and flLeft or flUp and flRight:
-                    robot.rect.y -= 6
+                    C_rooms.y += 6
+                    C_floor.y += 6
+                    for i in lst_of_walls:
+                        i.rect.y += 6
         for i2 in list_of_bullets:
             if i2.rect.colliderect(i.rect):
                 i2.printing = False
