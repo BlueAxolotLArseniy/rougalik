@@ -10,8 +10,10 @@ pygame.display.set_caption('GFR - Game For Rogalick')
 
 pointQ = None
 yQ = None
-XpointX = 200
-YpointY = 80
+XpointX = 20
+YpointY = 20
+
+spawnpoint = None
 
 number_of_on_mouse = 0
 
@@ -39,9 +41,13 @@ list_for_squares = []
 
 file = open('settings/samples/usual_fightes.txt', 'r')
 
+file2 = open('settings/samples/usual_fightes_rooms.txt', 'r')
+
 
 matrix_of_rooms = [[w for w in line.replace('\n', '')] for line in file]
 print(matrix_of_rooms)
+
+matrix_of_rooms_settings = [[w for w in line.replace('\n', '')] for line in file2]
 
 lst_of_walls = []
 
@@ -138,7 +144,7 @@ class Gun(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.original_image, int(self.angle))
         self.rect = self.image.get_rect(center=self.rect.center)
 
-rooms = pygame.Surface((2000, 2000), pygame.SRCALPHA, 32)
+rooms = pygame.Surface((10000, 10000), pygame.SRCALPHA, 32)
 C_rooms = rooms.get_rect()
 C_rooms.x = 0
 C_rooms.y = 0
@@ -149,7 +155,7 @@ pistolR = Gun(0, 0, 'textures/gun/pistol/p250R.png')
 
 test_bullet = Bullet(0, 0, 'textures/gun/bullet/yellow/rectangle.png')
 
-floor = pygame.Surface((2000, 2000), pygame.SRCALPHA, 32)
+floor = pygame.Surface((10000, 10000), pygame.SRCALPHA, 32)
 C_floor = floor.get_rect()
 C_floor.x = 0
 C_floor.y = 0
@@ -158,10 +164,12 @@ floor = floor.convert_alpha()
 robot = Hero(400, 250, 'textures/heroes/robot/red_robot.png')
 
 def draw_all_in_all():
-    global matrix_of_rooms, XpointX, YpointY
-    for i in matrix_of_rooms:
-        for k in i:
-            if XpointX == 1500: XpointX = 200
+    global matrix_of_rooms, XpointX, YpointY, spawnpoint
+    for i in range(len(matrix_of_rooms)):
+        for p in range(len(matrix_of_rooms[i])):
+            if XpointX == 1320: XpointX = 20
+            k = matrix_of_rooms_settings[i][p]
+            kSETTINGS = matrix_of_rooms[i][p]
             if k == '0' or k == '7':
                 q = open('settings/rooms&locations/vode/vode.txt')
                 q = [[w for w in line.replace('\n', '')] for line in q]
@@ -177,10 +185,69 @@ def draw_all_in_all():
                 dr_all(q)
             elif k == 'v':
                 pass
+            elif kSETTINGS == '4':
+                spawnpoint = [XpointX + 110, YpointY + 110]
             else:
-                q = open('settings/rooms&locations/fight/rooms.txt')
-                q = [[w for w in line.replace('\n', '')] for line in q]
-                dr_all(q)
+                if k == 'A':
+                    q = open('settings/rooms&locations/fight/ROOM_A.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'B':
+                    q = open('settings/rooms&locations/fight/ROOM_B.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'C':
+                    q = open('settings/rooms&locations/fight/ROOM_C.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'D':
+                    q = open('settings/rooms&locations/fight/ROOM_D.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'E':
+                    q = open('settings/rooms&locations/fight/ROOM_E.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'F':
+                    q = open('settings/rooms&locations/fight/ROOM_F.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'G':
+                    q = open('settings/rooms&locations/fight/ROOM_G.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'H':
+                    q = open('settings/rooms&locations/fight/ROOM_H.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'I':
+                    q = open('settings/rooms&locations/fight/ROOM_I.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'J':
+                    q = open('settings/rooms&locations/fight/ROOM_J.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'K':
+                    q = open('settings/rooms&locations/fight/ROOM_K.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'L':
+                    q = open('settings/rooms&locations/fight/ROOM_L.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'M':
+                    q = open('settings/rooms&locations/fight/ROOM_M.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'N':
+                    q = open('settings/rooms&locations/fight/ROOM_N.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
+                elif k == 'O':
+                    q = open('settings/rooms&locations/fight/ROOM_O.txt')
+                    q = [[w for w in line.replace('\n', '')] for line in q]
+                    dr_all(q)
             XpointX += 260
 
         YpointY += 260
@@ -246,6 +313,14 @@ def dr_one_stack(x, y, file):
                 floor.blit(wall.image, wall.rect)
         point += 20
 draw_all_in_all()
+C_rooms.x = -spawnpoint[0]
+C_rooms.y = -spawnpoint[1]
+C_floor.x = -spawnpoint[0]
+C_floor.y = -spawnpoint[1]
+# C_rooms.x = -(260 * 4.5)
+# C_rooms.y = -(260 * 2.5)
+# C_floor.x = -(260 * 4.5)
+# C_floor.y = -(260 * 2.5)
 clock = pygame.time.Clock()
 
 rooms_mask = pygame.mask.from_surface(rooms)
