@@ -17,6 +17,9 @@ spawnpoint = None
 
 number_of_on_mouse = 0
 
+SHOW_HITBOXES_ON_PLAYER = True
+SHOW_HITBOXES = True
+
 string_of_bullet = f'test_bullet{number_of_on_mouse} = Bullet(0, 0, "textures/gun/bullet/yellow/rectangle.png")'
 name_of_bullet = f'test_bullet{number_of_on_mouse}'
 
@@ -144,7 +147,7 @@ class Gun(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.original_image, int(self.angle))
         self.rect = self.image.get_rect(center=self.rect.center)
 
-rooms = pygame.Surface((10000, 10000), pygame.SRCALPHA, 32)
+rooms = pygame.Surface((5000, 5000), pygame.SRCALPHA, 32)
 C_rooms = rooms.get_rect()
 C_rooms.x = 0
 C_rooms.y = 0
@@ -155,7 +158,7 @@ pistolR = Gun(0, 0, 'textures/gun/pistol/p250R.png')
 
 test_bullet = Bullet(0, 0, 'textures/gun/bullet/yellow/rectangle.png')
 
-floor = pygame.Surface((10000, 10000), pygame.SRCALPHA, 32)
+floor = pygame.Surface((5000, 5000), pygame.SRCALPHA, 32)
 C_floor = floor.get_rect()
 C_floor.x = 0
 C_floor.y = 0
@@ -165,6 +168,7 @@ robot = Hero(400, 250, 'textures/heroes/robot/red_robot.png')
 
 def draw_all_in_all():
     global matrix_of_rooms, XpointX, YpointY, spawnpoint
+    points = 0
     for i in range(len(matrix_of_rooms)):
         for p in range(len(matrix_of_rooms[i])):
             if XpointX == 1320: XpointX = 20
@@ -249,8 +253,10 @@ def draw_all_in_all():
                     q = [[w for w in line.replace('\n', '')] for line in q]
                     dr_all(q)
             XpointX += 260
+            print('комната')
 
         YpointY += 260
+        print('система комнат', points)
 
 def new_bullet():
     global number_of_on_mouse, string_of_bullet, list_of_bullets, name_of_bullet
@@ -313,14 +319,13 @@ def dr_one_stack(x, y, file):
                 floor.blit(wall.image, wall.rect)
         point += 20
 draw_all_in_all()
-C_rooms.x = -spawnpoint[0]
-C_rooms.y = -spawnpoint[1]
-C_floor.x = -spawnpoint[0]
-C_floor.y = -spawnpoint[1]
-# C_rooms.x = -(260 * 4.5)
-# C_rooms.y = -(260 * 2.5)
-# C_floor.x = -(260 * 4.5)
-# C_floor.y = -(260 * 2.5)
+C_rooms.x -= 260
+C_rooms.y -= 500
+C_floor.x -= 260
+C_floor.y -= 500
+for i in lst_of_walls:
+    i.rect.y -= 500
+    i.rect.x -= 260
 clock = pygame.time.Clock()
 
 rooms_mask = pygame.mask.from_surface(rooms)
@@ -454,6 +459,11 @@ while running:
         rotate(pistolR)
         sc.blit(pistolR.image, pistolR.rect)
     sc.blit(cursor, pygame.mouse.get_pos())
+    if SHOW_HITBOXES_ON_PLAYER:
+        pygame.draw.rect(sc, (255, 255, 255), (robot.rect.x, robot.rect.y, 20, 20), 3)
+    if SHOW_HITBOXES:
+        for i in lst_of_walls:
+            pygame.draw.rect(sc, (255, 128, 0), (i.rect.x, i.rect.y, 20, 20), 1)
     pygame.display.flip()
     clock.tick(FPS)
     print(number_of_on_mouse, robot.rect.center)
