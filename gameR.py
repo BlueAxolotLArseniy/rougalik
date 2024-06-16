@@ -8,12 +8,10 @@ sc = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
 pygame.display.set_icon(pygame.image.load("textures/others/gameicon.bmp"))
 pygame.display.set_caption('GFR - Game For Rogalick')
 
-pointQ = None
-yQ = None
 XpointX = 20
 YpointY = 20
 
-spawnpoint = None
+FPS_SECONDS = 0
 
 number_of_on_mouse = 0
 
@@ -24,6 +22,7 @@ string_of_bullet = f'test_bullet{number_of_on_mouse} = Bullet(0, 0, "textures/gu
 name_of_bullet = f'test_bullet{number_of_on_mouse}'
 
 list_of_bullets = []
+copy_list_of_bullets = list_of_bullets
 
 pygame.mouse.set_visible(False)
 
@@ -257,15 +256,16 @@ def draw_all_in_all():
 
         YpointY += 260
         print('система комнат', points)
+        points += 1
 
 def new_bullet():
     global number_of_on_mouse, string_of_bullet, list_of_bullets, name_of_bullet
+    number_of_on_mouse = len(list_of_bullets)
     list_of_bullets.append(Bullet(robot.rect.centerx, robot.rect.centery, 'textures/gun/bullet/yellow/rectangle.png'))
     list_of_bullets[number_of_on_mouse].printing = True
     list_of_bullets[number_of_on_mouse].rect.center = robot.rect.center
     list_of_bullets[number_of_on_mouse].new_coordinates()
     rotate(list_of_bullets[number_of_on_mouse])
-    number_of_on_mouse += 1
 
 
 
@@ -394,7 +394,7 @@ while running:
 
     for i in lst_of_walls:
         if robot.rect.colliderect(i.rect):
-            print('awd')
+            # print('awd')
             if robot.rect.centerx < i.rect.centerx:
                 deepX = i.rect.left - robot.rect.right
             else:
@@ -403,7 +403,7 @@ while running:
                 deepY = i.rect.top - robot.rect.bottom
             else:
                 deepY = -(robot.rect.top - i.rect.bottom)
-            print(deepX, deepY)
+            # print(deepX, deepY)
             if abs(deepX) < abs(deepY):
                 C_rooms.x -= deepX
                 C_floor.x -= deepX
@@ -437,7 +437,7 @@ while running:
         player_direction_right = False
         player_direction_left = True
 
-
+    copy_list_of_bullets = list_of_bullets
     sc.fill((0, 0, 0))
     # rooms.fill((0, 0, 0))
     sc.blit(floor, C_floor)
@@ -447,7 +447,9 @@ while running:
         if i.printing == True:
             sc.blit(i.image, i.rect)
             i.move()
-        else: i.rect.center = pistol.rect.center
+        else:
+            copy_list_of_bullets.remove(i)
+            list_of_bullets = copy_list_of_bullets
     if pygame.mouse.get_pos()[0] - robot.rect.centerx > 0:
         pistol.rect.centerx = robot.rect.centerx
         pistol.rect.centery = robot.rect.centery
@@ -458,7 +460,7 @@ while running:
         pistolR.rect.centery = robot.rect.centery
         rotate(pistolR)
         sc.blit(pistolR.image, pistolR.rect)
-    sc.blit(cursor, pygame.mouse.get_pos())
+    sc.blit(cursor, (pygame.mouse.get_pos()[0]-10, pygame.mouse.get_pos()[1]-10))
     if SHOW_HITBOXES_ON_PLAYER:
         pygame.draw.rect(sc, (255, 255, 255), (robot.rect.x, robot.rect.y, 20, 20), 3)
     if SHOW_HITBOXES:
@@ -466,6 +468,9 @@ while running:
             pygame.draw.rect(sc, (255, 128, 0), (i.rect.x, i.rect.y, 20, 20), 1)
     pygame.display.flip()
     clock.tick(FPS)
-    print(number_of_on_mouse, robot.rect.center)
+    # print(number_of_on_mouse, robot.rect.center)
+    FPS_SECONDS += 1
+    print(FPS_SECONDS, FPS)
+
 
 pygame.quit()
